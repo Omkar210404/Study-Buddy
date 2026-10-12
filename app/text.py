@@ -6,7 +6,7 @@ _BULLET_RE = re.compile(r"^\s*(?:[-*+•]|\d{1,2}[.)])\s+")
 _HEADING_LINE_RE = re.compile(r"^\s{0,3}#{1,6}\s+\S")
 _SENTENCE_END_RE = re.compile(r"[.!?]+[\"')\]*`]*(?=\s|$)")
 _TRAILING_TOKEN_RE = re.compile(r"([A-Za-z.]+)$")
-WORD_RE = re.compile(r"[A-Za-z][A-Za-z0-9]*(?:[-'][A-Za-z0-9]+)*|\d+(?:[.,]\d+)*")
+WORD_RE = re.compile(r"[A-Za-z][A-Za-z0-9]*(?:[-'/][A-Za-z0-9]+)*|\d+(?:[.,]\d+)*")
 
 _ABBREVIATIONS = {"e.g", "i.e", "etc", "vs", "dr", "mr", "mrs", "ms", "prof", "fig", "no", "approx", "st", "cf"}
 
@@ -19,6 +19,11 @@ only or other our out over own same she should since so some such than that the 
 there these they this those through to too under until up upon us use used uses using very was we
 were what when where whether which while who whom why will with within without would you your
 called known means refers example examples e g i.e etc thing things way ways make makes made
+inside outside across along around behind beyond toward towards among per via versus onto near
+another several usually normally often sometimes still even long large larger small smaller high
+higher low lower new old same different first last next right left part parts kind kinds type
+types given gives give take takes need needs want wants let lets put puts get gets set sets
+well back away together instead rather quite almost already later earlier above below
 """.split())
 
 
