@@ -15,7 +15,7 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements-dev.txt
-      - name: Run tests (offline: no keys, no network)
+      - name: Run tests (no keys or network needed)
         run: pytest -q
 
   docker:
