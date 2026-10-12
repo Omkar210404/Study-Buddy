@@ -3,7 +3,15 @@
 A local web app that turns study notes into flashcards and quizzes. Every card is tied to a
 verbatim quote from the notes, and reviews are scheduled with SM-2.
 
-Status: **plan only, no application code yet. Waiting for approval.**
+Status: **approved and built.** The six decisions in section 15 were taken as recommended.
+Changes made during the build:
+
+- Grounding normalisation also ignores Markdown `**` and backticks (section 6).
+- Use cases live in one module, `app/services.py`, between the web layer and the pure modules.
+- Routes are split into `routes_pages.py`, `routes_decks.py` and `routes_study.py`; deck and notes
+  deletion use `POST .../delete` forms, and a generation run has its own page, `/runs/{id}`.
+- The typed quiz only counts an exact match when the expected answer contains a digit.
+- Offline generation allows up to two extra definition cards per passage, so glossary lists are not cut short.
 
 ## 1. Environment (inspected 2026-10-12)
 
