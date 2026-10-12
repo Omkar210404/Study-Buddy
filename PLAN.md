@@ -112,7 +112,9 @@ Decisions:
 Pure function: `validate(question, answer, quote, passage_text) -> GroundingResult`.
 
 1. **Normalise** both quote and passage: Unicode NFKC, curly quotes → straight, en/em dash → `-`,
-   every whitespace run → one space, strip wrapping quote marks. **Case-sensitive.** No fuzzy matching.
+   every whitespace run → one space, strip wrapping quote marks. Markdown `**` and backticks are
+   ignored (added during the build: models drop them when quoting, and no word is affected).
+   **Case-sensitive.** No fuzzy matching.
 2. Reject `quote_too_short` (< 12 chars or < 3 words) and `quote_too_long` (> 300 chars).
 3. Reject `quote_not_found` unless the normalised quote is a substring of the normalised passage.
    A quote with `...` in the middle fails; that is intended.
