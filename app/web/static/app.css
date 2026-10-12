@@ -209,6 +209,7 @@ input[type="text"], input[type="search"], input[type="file"], textarea, select {
 textarea { min-height: 7rem; resize: vertical; line-height: 1.5; }
 textarea.notes { min-height: 14rem; font-family: var(--serif); }
 .field { margin-bottom: 1.1rem; }
+.filters { display: grid; grid-template-columns: 2fr 1fr; gap: 0 1rem; }
 .or-line { color: var(--ink-soft); text-align: center; margin: 0.25rem 0 1rem; font-size: 0.9rem; }
 
 .sheet {
@@ -467,6 +468,7 @@ details[open] > summary { margin-bottom: 0.5rem; }
 @media (max-width: 30rem) {
   body { font-size: 1rem; }
   .ratings { grid-template-columns: repeat(2, 1fr); }
+  .filters { grid-template-columns: 1fr; }
   .actions .btn { flex: 1 1 100%; }
   .passage-head .where { margin-left: 0; flex-basis: 100%; }
 }

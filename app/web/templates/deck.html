@@ -19,7 +19,7 @@
   {% for source in deck.sources %}
   <li>
     <span class="name"><a href="/sources/{{ source.id }}">{{ source.title }}</a></span>
-    <span class="meta">{{ plural(source.passages|length, 'passage') }} · {{ source.kind }}</span>
+    <span class="meta">{{ plural(source.passages|length, 'passage') }} · {{ {'paste': 'pasted text', 'txt': 'text file', 'md': 'Markdown file', 'pdf': 'PDF'}[source.kind] }}</span>
   </li>
   {% endfor %}
 </ul>
