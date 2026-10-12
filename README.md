@@ -1,6 +1,6 @@
 # Study Buddy
 
-[![CI](https://github.com/Omkar210404/study-buddy/actions/workflows/ci.yml/badge.svg)](https://github.com/Omkar210404/study-buddy/actions/workflows/ci.yml)
+[![CI](https://github.com/Omkar210404/Study-Buddy/actions/workflows/ci.yml/badge.svg)](https://github.com/Omkar210404/Study-Buddy/actions/workflows/ci.yml)
 
 A small local web app that turns study notes into flashcards and quizzes. Every card is tied to an
 exact quote from the notes, and reviews are scheduled with the SM-2 spaced-repetition algorithm.
@@ -107,8 +107,8 @@ place where they meet storage, and the web layer only calls it and renders templ
 Needs Python 3.11 or newer.
 
 ```bash
-git clone https://github.com/Omkar210404/study-buddy.git
-cd study-buddy
+git clone https://github.com/Omkar210404/Study-Buddy.git
+cd Study-Buddy
 python -m venv .venv
 # Windows PowerShell:
 .venv\Scripts\Activate.ps1
