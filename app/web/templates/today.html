@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Today · Study Buddy{% endblock %}
+{% block content %}
+{% if not progress.decks %}
+  <h1>Turn your notes into cards you can trust</h1>
+  <p class="lede">Paste or upload your notes. Study Buddy cuts them into passages, makes flashcards and
+    quiz questions from them, and shows the exact sentence each card came from.</p>
+  <div class="actions">
+    <form method="post" action="/demo/load-sample">
+      <button class="btn primary big">Try it with the sample notes</button>
+    </form>
+    <a class="btn big" href="/decks">Create a deck</a>
+  </div>
+  <p class="quiet small">The sample is a short set of networking notes written for this project.</p>
+{% else %}
+  <h1>Today</h1>
+  {% if progress.due_today %}
+    <p class="headline"><strong>{{ plural(progress.due_today, 'card') }}</strong> due today.</p>
+    <div class="actions">
+      <a class="btn primary big" href="/review">Start review</a>
+    </div>
+  {% else %}
+    <p class="headline">Nothing is due today.</p>
+    <p class="quiet">{% if progress.reviews_today %}You gave {{ plural(progress.reviews_today, 'rating') }} today.
+      {% endif %}You can still take a quiz or add more notes.</p>
+  {% endif %}
+
+  <h2>Decks</h2>
+  <ul class="plain-list">
+    {% for deck in progress.decks %}
+    <li>
+      <span class="name"><a href="/decks/{{ deck.deck_id }}">{{ deck.name }}</a></span>
+      <span class="meta">{{ plural(deck.cards, 'card') }} · {{ deck.due_today }} due</span>
+      {% if deck.due_today %}<a href="/review?deck={{ deck.deck_id }}">Review</a>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="actions"><a class="btn" href="/decks">All decks</a></div>
+{% endif %}
+{% endblock %}

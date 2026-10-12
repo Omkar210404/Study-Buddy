@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Generation report · {{ deck.name }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/decks/{{ deck.id }}">{{ deck.name }}</a>{% if run.source_id %} · <a href="/sources/{{ run.source_id }}">{{ run.source_title }}</a>{% endif %}</p>
+<h1>{{ plural(run.accepted, 'card') }} added, {{ run.rejected }} rejected</h1>
+<p class="lede">
+  {% if run.mode == 'offline' %}Offline generation from {{ plural(run.passages_used, 'passage') }}. Nothing left this computer.
+  {% else %}Model generation ({{ run.provider }}, {{ run.model }}) from {{ run.passages_used }} of
+    {{ plural(run.passages_total, 'passage') }}.{% if run.provider == 'mock' %} The mock model runs on this computer.{% endif %}
+  {% endif %}
+  {{ run.created_at.strftime('%d %b %Y, %H:%M') }}.
+</p>
+
+<div class="actions">
+  <a class="btn primary" href="/review?deck={{ deck.id }}">Start review</a>
+  <a class="btn" href="/decks/{{ deck.id }}">See the deck</a>
+  {% if run.mode == 'llm' and run.source_id and run.passages_used < run.passages_total %}
+  <a class="btn" href="/sources/{{ run.source_id }}">Continue with the next passages</a>
+  {% endif %}
+</div>
+
+<div class="notice private">
+  <p><strong>How cards are checked.</strong> Every proposed card must carry a quote. The quote is compared with
+    the passage it claims to come from, ignoring only spacing, typographic quotes and Markdown markers. If it is
+    not there word for word, the card is rejected. This proves the quote is in your notes. It does not prove the
+    answer is right, so the quote is shown on the back of every card for you to judge.</p>
+</div>
+
+{% if run.rejections %}
+<h2>Rejected ({{ run.rejected }})</h2>
+{% for item in run.rejections %}
+<div class="report-row">
+  <p class="reason">{{ reasons.get(item.reason, item.reason) }}</p>
+  <p class="quiet small">Passage {{ item.passage_ordinal + 1 }}{% if item.section_title %} · {{ item.section_title }}{% endif %} · reason code: {{ item.reason }}</p>
+  {% if item.front %}<p><span class="label">Question</span> {{ item.front }}</p>{% endif %}
+  {% if item.back %}<p><span class="label">Answer</span> {{ item.back }}</p>{% endif %}
+  {% if item.quote %}<p><span class="label">Quote it gave</span> <span class="{% if item.reason == 'quote_not_found' %}fake-quote{% endif %}">{{ item.quote }}</span></p>{% endif %}
+  {% if item.detail %}<p class="quiet small">{{ item.detail }}</p>{% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<h2>Added ({{ run.accepted }})</h2>
+{% if run.cards %}
+{% for card in run.cards %}
+<div class="report-row kept">
+  <p><strong>{{ card.front }}</strong></p>
+  <p>{{ card.back }}</p>
+  <p class="small"><mark>{{ card.supporting_quote|plain }}</mark></p>
+</div>
+{% endfor %}
+{% elif run.accepted %}
+<p class="quiet">These cards have since been deleted.</p>
+{% else %}
+<p class="quiet">No cards were added in this run.</p>
+{% endif %}
+{% endblock %}

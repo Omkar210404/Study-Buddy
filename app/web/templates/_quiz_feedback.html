@@ -1,0 +1,38 @@
+<p class="session-count">{{ deck.name }} · question {{ number }} · {{ mode_label|lower }} · {{ right }} of {{ number }} right</p>
+
+<article class="flashcard">
+  <p class="verdict {{ 'right' if attempt.correct else 'wrong' }}" role="status">{{ 'Correct' if attempt.correct else 'Not quite' }}</p>
+  <p class="label">Question</p>
+  <div class="card-text smaller">{{ card.front }}</div>
+  <p class="label">Your answer</p>
+  <p class="typed-back">{{ answer if answer.strip() else '(left empty)' }}</p>
+  <p class="label">Answer</p>
+  <div class="card-text answer">{{ card.back }}</div>
+  <p class="label">From your notes</p>
+  <blockquote class="passage">{{ card.passage_before|plain }}<mark>{{ card.supporting_quote|plain }}</mark>{{ card.passage_after|plain }}</blockquote>
+  {% if check %}
+  <p class="check-line" style="margin-top: 1.25rem">
+    {% if attempt.overridden %}You overruled the text comparison.
+    {% elif check.verdict == 'exact' %}Text comparison: the same after ignoring capitals, punctuation and a leading "a" or "the".
+    {% elif check.verdict == 'close' %}Text comparison: {{ (check.similarity * 100)|round|int }}% similar, which passes the {{ (threshold * 100)|int }}% mark.
+    {% else %}Text comparison: {{ (check.similarity * 100)|round|int }}% similar to the card's answer. {{ (threshold * 100)|int }}% is needed, and answers with numbers must match exactly.
+    {% endif %}
+    This is a spelling comparison, not a judgement of meaning.
+  </p>
+  {% endif %}
+</article>
+
+<div class="actions centre">
+  <button type="button" class="btn primary big" data-next
+          hx-get="/quiz/question?deck={{ deck.id }}&mode={{ mode }}&number={{ number + 1 }}&right={{ right }}&previous={{ card.id }}"
+          hx-target="#stage" hx-swap="innerHTML">Next question</button>
+  {% if mode == 'typed' %}
+  <form hx-post="/quiz/attempts/{{ attempt.id }}/override" hx-target="#stage" hx-swap="innerHTML">
+    <input type="hidden" name="answer" value="{{ answer }}">
+    <input type="hidden" name="number" value="{{ number }}">
+    <input type="hidden" name="right" value="{{ right }}">
+    <button class="link-button">{{ 'Actually, I was wrong' if attempt.correct else 'I was right' }}</button>
+  </form>
+  {% endif %}
+  <p class="hint"><kbd>Enter</kbd> for the next question · quiz answers do not change your review schedule</p>
+</div>

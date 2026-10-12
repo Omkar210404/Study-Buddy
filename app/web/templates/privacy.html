@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Privacy · Study Buddy{% endblock %}
+{% block content %}
+<h1>Privacy</h1>
+<p class="lede">Your notes are yours. This page says exactly where they go.</p>
+
+<div class="notice {% if settings.llm_provider in ('none', 'mock') or not provider %}private{% endif %}">
+  <p><strong>Right now:</strong> {% include "_mode_line.html" %}</p>
+</div>
+
+<h2>What is stored</h2>
+<p>Everything is kept in one SQLite database file on this computer
+  (<code>{{ settings.database_path }}</code>): the text of your notes, the passages, your cards, and your review and
+  quiz history. Uploaded files are read once and not kept. There are no accounts and no analytics, and the pages
+  load no fonts or scripts from other sites.</p>
+
+<h2>Offline mode</h2>
+<p>This is the default. Importing notes, generating cards, reviewing, quizzes, the progress page and the Anki
+  export all run on this computer. <strong>Nothing leaves the machine.</strong></p>
+
+<h2>LLM mode</h2>
+<p>LLM mode is optional and off unless you set it up with environment variables. When you press
+  "Generate cards with the model" on a set of notes:</p>
+<ul>
+  <li><strong>Sent to the provider you configured:</strong> the text of the passages being processed in that run
+    (at most {{ settings.llm_max_passages_per_run }} per run), each with its section title and the instructions
+    for writing cards.</li>
+  <li><strong>Never sent:</strong> your other notes and decks, your existing cards, your review history, file
+    names, or anything about you.</li>
+</ul>
+<p>What the provider does with the passages is governed by that provider's own terms, so do not use LLM mode for
+  notes you would not share with them. Your API key is read from the environment, is used only in the request
+  header to that provider, and is never stored in the database or shown on any page.</p>
+
+<h2>Deleting your data</h2>
+<p>Delete a deck from its page to remove its notes, cards and history. To remove everything, close the app and
+  delete the database file.</p>
+{% endblock %}

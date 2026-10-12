@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Progress · Study Buddy{% endblock %}
+{% block content %}
+<h1>Progress</h1>
+{% if not progress.total_cards %}
+<p class="lede">Nothing to show yet. Progress is counted from your own reviews, so it starts empty.</p>
+<div class="actions"><a class="btn primary" href="/">Get started</a></div>
+{% else %}
+<p class="headline"><strong>{{ plural(progress.due_today, 'card') }}</strong> due today{% if progress.reviews_today %},
+  {{ plural(progress.reviews_today, 'review') }} done{% endif %}.</p>
+{% if progress.due_today %}<div class="actions"><a class="btn primary" href="/review">Start review</a></div>{% endif %}
+
+<h2>Reviews per day</h2>
+{% if progress.reviews_in_window %}
+<p class="quiet">{{ plural(progress.reviews_in_window, 'review') }} in the last {{ progress.days|length }} days.
+  Every press of a rating button counts as one review.</p>
+<div class="chart" role="img" aria-label="Bar chart of reviews per day for the last {{ progress.days|length }} days. The numbers are in the table below.">
+  <div class="bars">
+    {% for day in progress.days %}
+    <div class="bar-col {% if loop.index0 < 8 %}tip-left{% elif loop.revindex0 < 8 %}tip-right{% endif %}" tabindex="0"
+         data-tip="{{ day.day.strftime('%a %d %b') }}: {{ plural(day.count, 'review') }}">
+      {% if day.count %}
+      <span class="bar" style="height: {{ (100 * day.count / progress.busiest_day)|round(1) }}%">
+        {% if loop.index0 in labelled %}<span class="bar-label">{{ day.count }}</span>{% endif %}
+      </span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <div class="axis">
+    <span>{{ progress.days[0].day.strftime('%d %b') }}</span>
+    <span>{{ progress.days[(progress.days|length) // 2].day.strftime('%d %b') }}</span>
+    <span>Today</span>
+  </div>
+</div>
+<details>
+  <summary>Show the numbers as a table</summary>
+  <table class="numbers">
+    <thead><tr><th scope="col">Day</th><th scope="col">Reviews</th></tr></thead>
+    <tbody>
+      {% for day in progress.days|reverse if day.count %}
+      <tr><td>{{ day.day.strftime('%a %d %b %Y') }}</td><td class="num">{{ day.count }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</details>
+{% else %}
+<p class="quiet">No reviews in the last {{ progress.days|length }} days.</p>
+{% endif %}
+
+<h2>Retention by deck</h2>
+<p class="quiet">Of the times a card you had seen before came up for review, how often you did not press Again.
+  First looks at a new card are not counted.</p>
+<ul class="deck-progress">
+  {% for deck in progress.decks %}
+  <li>
+    <p class="name"><a href="/decks/{{ deck.deck_id }}">{{ deck.name }}</a></p>
+    {% if deck.retention_percent is not none %}
+    <p>{{ deck.retention_remembered }} of {{ deck.retention_reviews }} remembered ({{ deck.retention_percent }}%)</p>
+    <div class="meter" aria-hidden="true"><span style="width: {{ deck.retention_percent }}%"></span></div>
+    {% else %}
+    <p class="quiet">Not enough reviews yet. Retention appears after a card comes back for a second review.</p>
+    {% endif %}
+    <p class="quiet small">{{ plural(deck.cards, 'card') }} · {{ deck.due_today }} due today{% if deck.quiz_attempts %} · quiz: {{ deck.quiz_correct }} of {{ deck.quiz_attempts }} right ({{ deck.quiz_percent }}%){% endif %}</p>
+  </li>
+  {% endfor %}
+</ul>
+<p class="quiet small">All numbers on this page are counted from the {{ plural(progress.total_reviews, 'review') }} stored
+  in your local database. Nothing is estimated.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ source.title }} · {{ deck.name }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/decks/{{ deck.id }}">{{ deck.name }}</a></p>
+<h1>{{ source.title }}</h1>
+<p class="lede">{{ plural(source.passages|length, 'passage') }} from
+  {{ {'paste': 'pasted text', 'txt': 'a text file', 'md': 'a Markdown file', 'pdf': 'a PDF'}[source.kind] }}{% if source.filename %} ({{ source.filename }}){% endif %}.</p>
+
+{% if error %}<div class="notice error" role="alert"><p>{{ error }}</p></div>{% endif %}
+
+<h2>Generate cards</h2>
+<div class="sheet">
+  <h3 style="margin-top: 0">Offline</h3>
+  <p>Builds definition cards and fill-in-the-blank cards from the wording of your notes. No model is involved
+    and nothing leaves this computer. The cards are basic; edit or delete the ones you do not like.</p>
+  <form method="post" action="/sources/{{ source.id }}/generate">
+    <input type="hidden" name="mode" value="offline">
+    <button class="btn primary">Generate cards offline</button>
+  </form>
+</div>
+
+<div class="sheet">
+  <h3 style="margin-top: 0">With a language model <span class="quiet">(optional)</span></h3>
+  {% if provider %}
+    {% if settings.llm_provider == 'mock' %}
+    <p>The built-in <strong>mock</strong> model is active (mode: {{ settings.mock_llm_mode }}). It is a fake used
+      for demos and tests: it runs on this computer and its cards are labelled "mock".</p>
+    {% else %}
+    <div class="notice">
+      <p><strong>This sends your notes to {{ settings.llm_host }}.</strong> Up to
+        {{ settings.llm_max_passages_per_run }} passages from this page are sent, one request per passage,
+        to the model {{ settings.llm_model }}. Nothing else is sent.</p>
+    </div>
+    {% endif %}
+    <p>Every card the model writes must quote your notes. A program checks that the quote really appears in the
+      passage, and cards that fail are rejected and listed.</p>
+    <form method="post" action="/sources/{{ source.id }}/generate">
+      <input type="hidden" name="mode" value="llm">
+      <button class="btn">Generate cards with the model</button>
+    </form>
+  {% else %}
+    <p class="quiet">{% if provider_error %}{{ provider_error }}. {% endif %}LLM mode is off. To turn it on, set
+      LLM_PROVIDER, LLM_BASE_URL, LLM_MODEL and LLM_API_KEY in your environment (see .env.example) and
+      restart the app.</p>
+  {% endif %}
+</div>
+
+{% if runs %}
+<h2>Earlier runs</h2>
+<ul class="plain-list">
+  {% for run in runs %}
+  <li>
+    <span class="name"><a href="/runs/{{ run.id }}">{{ 'Offline' if run.mode == 'offline' else 'Model' }} run</a></span>
+    <span class="meta">{{ run.accepted }} added · {{ run.rejected }} rejected · {{ run.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<h2>Passages</h2>
+<ol class="passage-list">
+  {% for passage in source.passages %}
+  <li>
+    <div class="passage-head">
+      <span class="label" style="margin: 0">Passage {{ passage.ordinal + 1 }}{% if passage.section_title %} · {{ passage.section_title }}{% endif %}</span>
+      <span class="where">characters {{ passage.start_char }}–{{ passage.end_char }}{% if passage.page %} · page {{ passage.page }}{% endif %}</span>
+    </div>
+    <blockquote class="passage">{{ passage.text|plain }}</blockquote>
+  </li>
+  {% endfor %}
+</ol>
+
+<details>
+  <summary>Delete these notes</summary>
+  <div class="sheet">
+    <p>The notes and their passages are removed. Cards already made from them stay in the deck, each with its
+      own copy of the passage it came from.</p>
+    <form method="post" action="/sources/{{ source.id }}/delete" onsubmit="return confirm('Delete these notes?')">
+      <button class="btn danger">Delete notes</button>
+    </form>
+  </div>
+</details>
+{% endblock %}

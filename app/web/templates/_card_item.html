@@ -1,0 +1,18 @@
+<li class="card-row" id="card-{{ card.id }}">
+  <p class="card-q">{{ card.front }}</p>
+  <p class="card-a">{{ card.back }}</p>
+  <p class="card-quote"><mark>{{ card.supporting_quote|plain }}</mark></p>
+  <p class="card-meta">
+    <span>{{ {'definition': 'Definition', 'cloze': 'Fill in the blank', 'qa': 'Question'}[card.kind] }}</span>
+    {% if card.origin == 'mock' %}<span class="chip">mock</span>{% elif card.origin == 'llm' %}<span class="chip">LLM</span>{% endif %}
+    {% for name in card.tag_names %}<span class="chip">{{ name }}</span>{% endfor %}
+    <span>· {{ 'new' if card.is_new else due_text(card.due_date, today) }}</span>
+  </p>
+  <div class="card-row-actions">
+    <button type="button" class="link-button" hx-get="/cards/{{ card.id }}/edit"
+            hx-target="#card-{{ card.id }}" hx-swap="outerHTML">Edit</button>
+    <button type="button" class="link-button danger" hx-delete="/cards/{{ card.id }}"
+            hx-target="#card-{{ card.id }}" hx-swap="outerHTML"
+            hx-confirm="Delete this card?">Delete</button>
+  </div>
+</li>

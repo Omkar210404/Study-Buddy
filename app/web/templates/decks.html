@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Decks · Study Buddy{% endblock %}
+{% block content %}
+<h1>Decks</h1>
+{% if decks %}
+<ul class="plain-list">
+  {% for deck, cards, due in decks %}
+  <li>
+    <span class="name"><a href="/decks/{{ deck.id }}">{{ deck.name }}</a></span>
+    <span class="meta">{{ plural(cards, 'card') }} · {{ due }} due</span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="lede">No decks yet. A deck holds the notes and cards for one subject.</p>
+{% endif %}
+
+<h2>New deck</h2>
+<form class="sheet" method="post" action="/decks">
+  <div class="field">
+    <label for="deck-name">Name</label>
+    <input type="text" id="deck-name" name="name" required maxlength="120" placeholder="Statistics, week 3">
+  </div>
+  <div class="field">
+    <label for="deck-description">Description <span class="quiet">(optional)</span></label>
+    <input type="text" id="deck-description" name="description" maxlength="300">
+  </div>
+  <button class="btn primary">Create deck</button>
+</form>
+
+<form method="post" action="/demo/load-sample">
+  <p class="quiet small">Want something to look at first?
+    <button class="link-button">Load the sample networking deck</button></p>
+</form>
+{% endblock %}

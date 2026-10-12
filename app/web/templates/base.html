@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Study Buddy{% endblock %}</title>
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem("theme");
+        if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+      } catch (error) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    {% if focus %}
+      <a class="leave" href="{{ leave_url or '/' }}">&larr; Leave</a>
+    {% else %}
+      <a class="wordmark" href="/">Study Buddy</a>
+      <nav aria-label="Main">
+        <a href="/" {% if active == 'today' %}aria-current="page"{% endif %}>Today</a>
+        <a href="/decks" {% if active == 'decks' %}aria-current="page"{% endif %}>Decks</a>
+        <a href="/progress" {% if active == 'progress' %}aria-current="page"{% endif %}>Progress</a>
+        <a href="/privacy" {% if active == 'privacy' %}aria-current="page"{% endif %}>Privacy</a>
+      </nav>
+    {% endif %}
+    <button type="button" class="theme-toggle" id="theme-toggle">Dark mode</button>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if not focus %}
+  <footer class="site-footer">
+    {% include "_mode_line.html" %}
+    <a href="/privacy">What is stored and what is sent</a>
+  </footer>
+  {% endif %}
+</body>
+</html>

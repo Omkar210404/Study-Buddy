@@ -1,0 +1,12 @@
+{% if cards %}
+<p class="quiet small">{{ plural(cards|length, 'card') }}{% if q or tag or kind %} match{{ 'es' if cards|length == 1 else '' }}{% endif %}</p>
+<ul class="card-rows">
+  {% for card in cards %}
+  {% include "_card_item.html" %}
+  {% endfor %}
+</ul>
+{% elif q or tag or kind %}
+<p class="quiet">No cards match. <a href="/decks/{{ deck.id }}">Clear the filters</a></p>
+{% else %}
+<p class="quiet">No cards yet. Add notes, then generate cards from them.</p>
+{% endif %}

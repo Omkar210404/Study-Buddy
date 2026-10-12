@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ deck.name }} · Study Buddy{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/decks">Decks</a></p>
+<h1>{{ deck.name }}</h1>
+{% if deck.description %}<p class="lede">{{ deck.description }}</p>{% endif %}
+<p>{{ plural(deck.cards|length, 'card') }}, {{ due }} due today.</p>
+
+<div class="actions">
+  <a class="btn primary" href="/review?deck={{ deck.id }}">Review{% if due %} ({{ due }}){% endif %}</a>
+  <a class="btn" href="/decks/{{ deck.id }}/quiz?mode=mc">Quiz</a>
+  <a class="btn" href="/decks/{{ deck.id }}/quiz?mode=typed">Typed quiz</a>
+  <a class="btn" href="/decks/{{ deck.id }}/import">Add notes</a>
+</div>
+
+<h2>Notes</h2>
+{% if deck.sources %}
+<ul class="plain-list">
+  {% for source in deck.sources %}
+  <li>
+    <span class="name"><a href="/sources/{{ source.id }}">{{ source.title }}</a></span>
+    <span class="meta">{{ plural(source.passages|length, 'passage') }} · {{ source.kind }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="quiet">No notes yet. <a href="/decks/{{ deck.id }}/import">Add notes</a> to make cards.</p>
+{% endif %}
+
+<h2>Cards</h2>
+<form class="filters" action="/decks/{{ deck.id }}" method="get"
+      hx-get="/decks/{{ deck.id }}/cards" hx-target="#card-list"
+      hx-trigger="input changed delay:250ms from:#card-search, change from:#card-kind, submit">
+  <div class="field">
+    <label for="card-search">Search</label>
+    <input type="search" id="card-search" name="q" value="{{ q }}" placeholder="Question, answer or quote">
+  </div>
+  <div class="field">
+    <label for="card-kind">Kind</label>
+    <select id="card-kind" name="kind">
+      <option value="" {% if not kind %}selected{% endif %}>All kinds</option>
+      <option value="definition" {% if kind == 'definition' %}selected{% endif %}>Definition</option>
+      <option value="cloze" {% if kind == 'cloze' %}selected{% endif %}>Fill in the blank</option>
+      <option value="qa" {% if kind == 'qa' %}selected{% endif %}>Question and answer</option>
+    </select>
+  </div>
+  <input type="hidden" name="tag" value="{{ tag }}">
+</form>
+{% if tags %}
+<div class="chips" aria-label="Tags">
+  <a class="chip {% if not tag %}on{% endif %}" href="/decks/{{ deck.id }}">all tags</a>
+  {% for name, count in tags %}
+  <a class="chip {% if tag == name %}on{% endif %}" href="/decks/{{ deck.id }}?tag={{ name|urlencode }}">{{ name }} · {{ count }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<div id="card-list">
+  {% include "_card_list.html" %}
+</div>
+
+<details>
+  <summary>Deck settings, export and delete</summary>
+  <div class="sheet">
+    <h3>Export</h3>
+    <p><a href="/decks/{{ deck.id }}/export.csv">Download this deck as a CSV for Anki</a></p>
+    <p class="help">In Anki choose File, Import. Each card's back includes its supporting quote.
+      Review history is not exported.</p>
+    <h3>Rename</h3>
+    <form method="post" action="/decks/{{ deck.id }}/edit">
+      <div class="field">
+        <label for="rename-name">Name</label>
+        <input type="text" id="rename-name" name="name" value="{{ deck.name }}" required maxlength="120">
+      </div>
+      <div class="field">
+        <label for="rename-description">Description</label>
+        <input type="text" id="rename-description" name="description" value="{{ deck.description }}" maxlength="300">
+      </div>
+      <button class="btn">Save</button>
+    </form>
+    <h3>Delete</h3>
+    <form method="post" action="/decks/{{ deck.id }}/delete"
+          onsubmit="return confirm('Delete this deck with its notes, cards and review history?')">
+      <button class="btn danger">Delete this deck</button>
+    </form>
+  </div>
+</details>
+{% endblock %}

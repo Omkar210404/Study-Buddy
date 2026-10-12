@@ -1,0 +1,30 @@
+<li class="card-row editing" id="card-{{ card.id }}">
+  <form hx-put="/cards/{{ card.id }}" hx-target="#card-{{ card.id }}" hx-swap="outerHTML">
+    {% if error %}<div class="notice error" role="alert"><p>{{ error }}</p></div>{% endif %}
+    <div class="field">
+      <label for="front-{{ card.id }}">Question</label>
+      <textarea id="front-{{ card.id }}" name="front" rows="2" required>{{ front }}</textarea>
+    </div>
+    <div class="field">
+      <label for="back-{{ card.id }}">Answer</label>
+      <textarea id="back-{{ card.id }}" name="back" rows="2" required>{{ back }}</textarea>
+    </div>
+    <div class="field">
+      <label for="quote-{{ card.id }}">Supporting quote</label>
+      <textarea id="quote-{{ card.id }}" name="quote" rows="3" required>{{ quote }}</textarea>
+      <p class="help">Must be copied from the passage below. It is checked again when you save.</p>
+    </div>
+    <p class="label">Passage this card came from</p>
+    <blockquote class="passage">{{ card.source_passage|plain }}</blockquote>
+    <div class="field" style="margin-top: 1.1rem">
+      <label for="tags-{{ card.id }}">Tags</label>
+      <input type="text" id="tags-{{ card.id }}" name="tags" value="{{ tags }}" placeholder="exam, week 3">
+      <p class="help">Separate tags with commas.</p>
+    </div>
+    <div class="actions">
+      <button class="btn primary">Save</button>
+      <button type="button" class="btn" hx-get="/cards/{{ card.id }}" hx-target="#card-{{ card.id }}"
+              hx-swap="outerHTML">Cancel</button>
+    </div>
+  </form>
+</li>

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Quiz · {{ deck.name }}{% endblock %}
+{% block content %}
+<div class="stage" id="stage">
+  {% include "_quiz_question.html" %}
+</div>
+{% endblock %}

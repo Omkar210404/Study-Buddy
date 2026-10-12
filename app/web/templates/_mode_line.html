@@ -1,0 +1,9 @@
+{% if settings.llm_provider == 'none' %}
+Offline mode. Nothing leaves this computer.
+{% elif settings.llm_provider == 'mock' %}
+Mock LLM mode. A built-in fake model is used; nothing leaves this computer.
+{% elif provider %}
+LLM mode is available. Passages you choose to generate cards from are sent to {{ settings.llm_host }}. Everything else stays on this computer.
+{% else %}
+LLM mode is not set up correctly, so only offline mode works. Nothing leaves this computer.
+{% endif %}

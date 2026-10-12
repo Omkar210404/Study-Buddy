@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Add notes · {{ deck.name }}{% endblock %}
+{% block content %}
+<p class="crumb"><a href="/decks/{{ deck.id }}">{{ deck.name }}</a></p>
+<h1>Add notes</h1>
+<p class="lede">Paste text, or upload a .txt, .md or text-based PDF file.</p>
+
+{% if error %}<div class="notice error" role="alert"><p>{{ error }}</p></div>{% endif %}
+
+<form class="sheet" method="post" action="/decks/{{ deck.id }}/sources" enctype="multipart/form-data">
+  <div class="field">
+    <label for="notes-title">Title <span class="quiet">(optional)</span></label>
+    <input type="text" id="notes-title" name="title" value="{{ title }}" maxlength="200" placeholder="Lecture 4: transport layer">
+  </div>
+  <div class="field">
+    <label for="notes-text">Paste your notes</label>
+    <textarea class="notes" id="notes-text" name="text" placeholder="# Heading&#10;&#10;Your notes...">{{ text }}</textarea>
+    <p class="help">Markdown headings (# Title) become section titles.</p>
+  </div>
+  <p class="or-line">or</p>
+  <div class="field">
+    <label for="notes-file">Upload a file</label>
+    <input type="file" id="notes-file" name="file" accept=".txt,.md,.markdown,.pdf,text/plain,application/pdf">
+    <p class="help">Up to {{ settings.max_upload_mb }} MB. If you choose a file, the pasted text is ignored.</p>
+  </div>
+  <button class="btn primary">Import notes</button>
+</form>
+
+<div class="notice">
+  <p><strong>Scanned PDFs are not supported.</strong> Study Buddy reads the text that is already inside a PDF.
+    A scan is a picture of a page, and this app does not do OCR.</p>
+</div>
+<div class="notice private">
+  <p>Importing notes sends nothing anywhere. The text is saved in a database file on this computer.
+    The uploaded file itself is not kept.</p>
+</div>
+{% endblock %}

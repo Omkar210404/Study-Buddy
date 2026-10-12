@@ -1,0 +1,54 @@
+{% if card %}
+<div class="session-line" aria-hidden="true"><span style="width: {{ (100 * done / (done + remaining))|round|int }}%"></span></div>
+<p class="session-count">{{ plural(remaining, 'card') }} left{% if deck %} in {{ deck.name }}{% endif %}{% if done %} · {{ done }} done today{% endif %}</p>
+
+<article class="flashcard">
+  <p class="label">Question{% if card.section_title %} · {{ card.section_title }}{% endif %}{% if card.origin == 'mock' %} <span class="chip">mock</span>{% endif %}</p>
+  <div class="card-text">{{ card.front }}</div>
+  <div data-back hidden>
+    <hr>
+    <p class="label">Answer</p>
+    <div class="card-text answer">{{ card.back }}</div>
+    <p class="label">From your notes</p>
+    <blockquote class="passage">{{ card.passage_before|plain }}<mark>{{ card.supporting_quote|plain }}</mark>{{ card.passage_after|plain }}</blockquote>
+    <p class="source-line">{{ card.source_title }}{% if card.section_title %}, section "{{ card.section_title }}"{% endif %}. The marked words are the quote this card rests on.</p>
+  </div>
+</article>
+
+<div class="actions centre" data-front-only>
+  <button type="button" class="btn primary big" data-flip>Show answer</button>
+  <p class="hint"><kbd>Space</kbd> flips the card</p>
+</div>
+
+<form class="ratings" data-back hidden hx-post="/review/{{ card.id }}/rate" hx-target="#stage" hx-swap="innerHTML">
+  <input type="hidden" name="deck" value="{{ deck_id if deck_id is not none else '' }}">
+  {% for rating, label, hint in buttons %}
+  <button class="rate rate-{{ label|lower }}" name="rating" value="{{ rating }}" data-key="{{ rating }}">
+    <span class="rate-label">{{ label }}</span>
+    <span class="rate-hint">{{ hint }}</span>
+    <kbd>{{ rating }}</kbd>
+  </button>
+  {% endfor %}
+</form>
+<p class="hint" data-back hidden>How well did you remember it? Each button shows when the card comes back.</p>
+
+{% else %}
+<div class="done">
+  {% if done %}
+  <p class="headline">Done for today.</p>
+  <p class="quiet">You reviewed {{ plural(done, 'card') }}{% if deck %} in {{ deck.name }}{% endif %}. Come back tomorrow.</p>
+  {% else %}
+  <p class="headline">Nothing is due{% if deck %} in {{ deck.name }}{% endif %}.</p>
+  <p class="quiet">New cards appear here on the day you make them. Reviewed cards return on their due date.</p>
+  {% endif %}
+  <div class="actions centre">
+    {% if deck %}
+    <a class="btn primary" href="/decks/{{ deck.id }}/quiz?mode=mc">Take a quiz instead</a>
+    <a class="btn" href="/decks/{{ deck.id }}">Back to the deck</a>
+    {% else %}
+    <a class="btn primary" href="/progress">See your progress</a>
+    <a class="btn" href="/">Back to today</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

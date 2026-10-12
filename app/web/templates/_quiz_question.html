@@ -1,0 +1,42 @@
+{% if card %}
+<p class="session-count">{{ deck.name }} · question {{ number }} · {{ mode_label|lower }}{% if number > 1 %} · {{ right }} of {{ number - 1 }} right{% endif %}</p>
+
+<article class="flashcard">
+  <p class="label">Question{% if card.section_title %} · {{ card.section_title }}{% endif %}</p>
+  <div class="card-text">{{ card.front }}</div>
+</article>
+
+{% if mode == 'mc' %}
+<form class="options" hx-post="/quiz/answer" hx-target="#stage" hx-swap="innerHTML">
+  <input type="hidden" name="card_id" value="{{ card.id }}">
+  <input type="hidden" name="mode" value="mc">
+  <input type="hidden" name="number" value="{{ number }}">
+  <input type="hidden" name="right" value="{{ right }}">
+  {% for option in question.options %}
+  <button class="option" name="answer" value="{{ option }}" data-key="{{ loop.index }}">
+    <kbd>{{ loop.index }}</kbd><span>{{ option }}</span>
+  </button>
+  {% endfor %}
+</form>
+<p class="hint">The wrong options are answers to other cards in this deck.</p>
+{% else %}
+<form class="typed-form" hx-post="/quiz/answer" hx-target="#stage" hx-swap="innerHTML">
+  <input type="hidden" name="card_id" value="{{ card.id }}">
+  <input type="hidden" name="mode" value="typed">
+  <input type="hidden" name="number" value="{{ number }}">
+  <input type="hidden" name="right" value="{{ right }}">
+  <input type="text" name="answer" aria-label="Your answer" placeholder="Type your answer" autocomplete="off"
+         autocapitalize="off" spellcheck="false" data-autofocus>
+  <button class="btn primary">Check</button>
+</form>
+<p class="hint">Your answer is compared with the card's answer as text. You can overrule the result.</p>
+{% endif %}
+
+{% else %}
+<div class="done">
+  <p class="headline">Not enough cards for this quiz yet.</p>
+  <p class="quiet">{% if mode == 'mc' %}Multiple choice needs at least two cards with different answers, because the
+    wrong options are taken from other cards in the same deck.{% else %}This deck has no cards yet.{% endif %}</p>
+  <div class="actions centre"><a class="btn" href="/decks/{{ deck.id }}">Back to the deck</a></div>
+</div>
+{% endif %}
